@@ -1,5 +1,4 @@
-function onElementClick(event){
-    event.stopPropagation();
+function onInputFocus(event){
 
     toggleBackground(event.target);
 
@@ -8,21 +7,15 @@ function onElementClick(event){
     // this.removeEventListener('click', sayHello);
 }
 
-const h2 = 
-    document.getElementsByTagName('h2')[0];
-
-h2.addEventListener('click', sayHello);
-
-document.body.addEventListener('click', function(e){
-    console.log('body', e);
-
-    toggleBackground(e.target);
-
-})
-
 function toggleBackground(el){
     el.style.background =
         el.style.background === 'yellow' ?
             'red':'yellow';
 }
 
+const input = document.getElementById('input');
+input.addEventListener('mouseup', onInputFocus)
+input.addEventListener('blur', onInputFocus);
+
+document.getElementById('title')
+    .addEventListener('focus', onInputFocus);
