@@ -6,6 +6,7 @@ const contactAgeInput = document.getElementById('ageInput');
 const contactTemplate = document.getElementById('contactTemplate').innerHTML;
 
 addContactBtn.addEventListener('click', onAddContactBtnClick);
+addContact({name: 'Alex', phone:'111'});
 
 function onAddContactBtnClick(){
     submitContact();
@@ -38,5 +39,3 @@ function resetContactForm(){
     contactPhoneInput.value = '';
     contactAgeInput.value = '';
 }
-
-addContact({name: 'Alex', phone:'111'});
