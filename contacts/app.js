@@ -15,12 +15,13 @@ function onAddContactBtnClick(){
 
 function onContactsListClick(event){
     if (event.target.tagName === 'BUTTON'){
-        removeContact(event.target.parentNode.parentNode);
+        removeContact(event.target.attributes['contact-id'].value);
     }
 }
 
-function removeContact(el){
-    el.remove();
+function removeContact(contactId){
+    const el = document.getElementById('contact' + contactId);
+    el && el.remove();
 }
 
 function submitContact(){
@@ -34,12 +35,16 @@ function submitContact(){
 }
 
 function addContact(contact){
+    contact.id = Date.now();
+
     const contactTr = document.createElement('tr');
-    
+    contactTr.id = 'contact' + contact.id;
+
     contactTr.innerHTML = contactTemplate
                 .replace('{{name}}', contact.name)
                 .replace('{{phone}}', contact.phone)
-                .replace('{{age}}', contact.age || '-');
+                .replace('{{age}}', contact.age || '-')
+                .replace('{{id}}', contact.id)
 
     contactsList.appendChild(contactTr);
 
