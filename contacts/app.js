@@ -6,10 +6,21 @@ const contactAgeInput = document.getElementById('ageInput');
 const contactTemplate = document.getElementById('contactTemplate').innerHTML;
 
 addContactBtn.addEventListener('click', onAddContactBtnClick);
+contactsList.addEventListener('click', onContactsListClick);
 addContact({name: 'Alex', phone:'111'});
 
 function onAddContactBtnClick(){
     submitContact();
+}
+
+function onContactsListClick(event){
+    if (event.target.tagName === 'BUTTON'){
+        removeContact(event.target.parentNode.parentNode);
+    }
+}
+
+function removeContact(el){
+    el.remove();
 }
 
 function submitContact(){
