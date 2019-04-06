@@ -1,4 +1,4 @@
-function BallGame(el, height, widtg){
+function BallGame(el, height, width){
 
 }
 
