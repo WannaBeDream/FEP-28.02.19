@@ -1,0 +1,17 @@
+.ball-game-field{
+    border: 1px solid grey;
+    background-color: beige;
+    position: relative;
+    display: inline-block;
+}
+
+.ball-game-ball{
+    display: inline-block;
+    background-color: blue;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 10px;
+    width: 10px;
+    z-index: 100;
+}
