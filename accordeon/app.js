@@ -28,7 +28,6 @@ Accordeon.prototype.toggleElement = function(el) {
 }
 
 Accordeon.prototype.closeElement = function(el){
-    console.log(el);
     el.classList.remove('open');
 }
 
