@@ -1,0 +1,49 @@
+.gallery-container {
+    height: 500px;
+    position: relative;
+}
+
+.gallery-item {
+    height: 100%;
+    text-align: center;
+    list-style-type: none;
+    display: none;
+}
+
+.gallery-item.show{
+    display: block;
+}
+
+.gallery-item img{
+    /* width: 100%; */
+    height: 100%;
+}
+
+.gallery-button {
+    position: absolute;
+    height: 100%;
+    top: 0;
+    width: 30px;
+    background-color: white;
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    opacity: 0.2;
+    list-style-type: none;
+    vertical-align: middle;
+    text-align: center;
+    padding-top: 200px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.gallery-button:hover {
+    opacity: 0.5;
+}
+
+.gallery-button.left {
+    left: 0;
+}
+
+.gallery-button.right {
+    right: 0;
+}
