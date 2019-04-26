@@ -79,7 +79,7 @@ class Tabset{
     next(){
         const newIndex = this.activeIndex + 1;
 
-        if (this.activeIndex >= this.titlesList.children.length) {
+        if (newIndex >= this.titlesList.children.length) {
             newIndex = 0;
         }
 
@@ -89,7 +89,7 @@ class Tabset{
     prev(){
         const newIndex = this.activeIndex - 1;
 
-        if (this.activeIndex < 0) {
+        if (newIndex < 0) {
             newIndex = this.titlesList.children.length - 1;
         }
 
@@ -101,6 +101,6 @@ const tabs = new Tabset(
                         document.getElementById('container')
                     );
 
-tabs.show();
+tabs.show(0);
 tabs.next();
 tabs.prev();
