@@ -4,8 +4,8 @@ USAGE:
 request('get', 'http://exmaple.com', (resp)=> {console.log(resp)} );
 */
 
-var request = function() {
-    var xhr = new XMLHttpRequest();
+const request = function() {
+    const xhr = new XMLHttpRequest();
     return function( method, url, callback ) {
         xhr.onload = function() {
             callback( JSON.parse(xhr.responseText));
@@ -68,3 +68,4 @@ class Users{
 const usersList = new Users(
     document.getElementById('usersListTable')
 )
+
