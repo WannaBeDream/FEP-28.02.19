@@ -1,23 +1,31 @@
-
-/****** Function to make request *******
-USAGE: 
-request('get', 'http://exmaple.com', (resp)=> {console.log(resp)} );
-*/
-
-const request = function() {
-    const xhr = new XMLHttpRequest();
-    return function( method, url, callback ) {
-        xhr.onload = function() {
-            callback( JSON.parse(xhr.responseText));
-        };
-        xhr.open( method, url );
-        xhr.send();
-    };
-}();
+function request (method, url) {
+    return new Promise(function (resolve, reject) {
+      var xhr = new XMLHttpRequest();
+      xhr.open(method, url);
+      xhr.onload = function () {
+        if (this.status >= 200 && this.status < 300) {
+          resolve(JSON.parse(xhr.response));
+        } else {
+          reject({
+            status: this.status,
+            statusText: xhr.statusText
+          });
+        }
+      };
+      xhr.onerror = function () {
+        reject({
+          status: this.status,
+          statusText: xhr.statusText
+        });
+      };
+      xhr.send();
+    });
+  }
 class Users{
     static BASE_URL = 'https://jsonplaceholder.typicode.com';
     static USERS_PATH = '/users';
     static POSTS_PATH = '/posts';
+    static ALBUMS_PATH = '/albums'
     static USER_ROW_TEMPLATE = document.getElementById('userTemplate').innerHTML;
 
     constructor(container){
@@ -27,9 +35,11 @@ class Users{
 
     init(){
         this.onBodyClick = this.onBodyClick.bind(this);
-        this.renderUsers = this.renderUsers.bind(this);
 
         this.tbody = this.container.getElementsByTagName('tbody')[0];
+        this.userPosts = document.getElementById('userPosts');
+        this.userAlbums = document.getElementById('userAlbums');
+
         this.tbody.addEventListener('click', this.onBodyClick)
         this.fetchUsers();
     }
@@ -37,11 +47,12 @@ class Users{
     onBodyClick(e){
         const id = e.target.parentNode.dataset.userId;
 
-        this.fetchUserPosts(id);
+        this.fetchUserItems(id);
     }
 
     fetchUsers(){
-        request('get', Users.BASE_URL + Users.USERS_PATH, this.renderUsers)
+        return request('get', Users.BASE_URL + Users.USERS_PATH)
+            .then((data) => this.renderUsers(data));
     }
 
     renderUsers(usersList){
@@ -54,13 +65,32 @@ class Users{
         }).join('\n');
     }
 
+    fetchUserItems(userId){
+        this.fetchUserPosts(userId)
+            .then(() => this.fetchUserAlbums(userId))
+    }
+
     fetchUserPosts(userId){
         const url = Users.BASE_URL + Users.POSTS_PATH + '?userId=' + userId;
-        request('get', url, this.renderUserPosts)
+        return request('get', url)
+            .then((data) => this.renderUserPosts(data));
     }
 
     renderUserPosts(posts){
-        console.log(posts);
+        this.userPosts.innerHTML = this.prepareList(posts);
+    }
+
+    fetchUserAlbums(userId){
+        const url = Users.BASE_URL + Users.ALBUMS_PATH + '?userId=' + userId;
+        return request('get', url)
+            .then((data) => this.renderUserAlbums(data));    }
+
+    renderUserAlbums(albums){
+        this.userAlbums.innerHTML = this.prepareList(albums);
+    }
+
+    prepareList(data){
+        return data.map((el) => `<li>${el.title}</li>`).join('\n');
     }
 
 }
