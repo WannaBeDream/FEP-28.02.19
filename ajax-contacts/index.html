@@ -11,7 +11,7 @@
     <script src="./app.js" async></script>
 </head>
 <body>
-    <form id="newContactForm">
+    <form id="contactForm">
         <table class="u-full-width">
             <thead>
                 <tr>
@@ -22,9 +22,10 @@
                 </tr>
             </thead>
             <tbody id="contactsList"></tbody>
-            <tfoot>
-                <tr>
+            <tfoot id="contactsListFooter">
+                <tr id="contactFormRow">
                     <td>
+                        <input type="hidden" id="idInput" name="idInput">
                         <input type="text" id="nameInput" name="nameInput">
                     </td>
                     <td>
@@ -33,18 +34,30 @@
                     <td>
                         <input type="text" id="emailInput" name="emailInput">
                     </td>
-                    <td><input type="submit" value="Add Contact"></td>
+                    <td><input type="submit" value="Save"></td>
                 </tr>
             </tfoot>
         </table>
     </form>
     <script type="text/template" id="contactTemplate">
-        <tr data-contact-id="{{id}}" class="{{class}}">
+        <tr data-contact-id="{{id}}" class="contact-row {{class}}">
             <td>{{name}}</td>
             <td>{{phone}}</td>
             <td>{{email}}</td>
-            <td><button type="button">Delete</button></td>
+            <td>
+                <button type="button" data-type="edit">Edit</button>
+                <button type="button" data-type="delete">Delete</button>
+            </td>
         </tr>
+    </script>
+    <script type="text/template" id="modalTemplate">
+        <ul class="modal-content">
+                <li>{{id}}</li>
+                <li>{{name}}</li>
+                <li>{{phone}}</li>
+                <li>{{email}}</li>
+                <li>{{isActive}}</li>
+        </ul>
     </script>
 </body>
 </html>
