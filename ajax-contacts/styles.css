@@ -27,3 +27,8 @@
     margin: 0 auto;
     width: 400px;
 }
+
+input.invalid {
+    border-color: red;
+    background-color: rosybrown;
+}

@@ -1,168 +1,164 @@
-const URL = 'http://fep-app.herokuapp.com/api/contacts';
-const contactForm = document.getElementById('contactForm');
-const contactsList = document.getElementById('contactsList');
-const contactsListFooter = document.getElementById('contactsListFooter');
-const contactFormRow = document.getElementById('contactFormRow');
-const contactIdInput = document.getElementById('idInput');
-const contactNameInput = document.getElementById('nameInput');
-const contactPhoneInput = document.getElementById('phoneInput');
-const contactEmailInput = document.getElementById('emailInput');
-const contactTemplate = document.getElementById('contactTemplate').innerHTML;
-const modalTemplate = document.getElementById('modalTemplate').innerHTML;
+$(function(){
+    const INVALID_CLASS = 'invalid';
+    const URL = 'http://fep-app.herokuapp.com/api/contacts';
+    const PATTERNS = {
+        emailInput: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+        phoneInput: /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$/,
+    }
+    const $contactForm = $('#contactForm');
+    const $contactsList = $('#contactsList');
+    const $contactIdInput = $('#idInput');
+    const $contactNameInput = $('#nameInput');
+    const $contactPhoneInput = $('#phoneInput');
+    const $contactEmailInput = $('#emailInput');
+    const $dialog = $('#dialog-form').dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            Create: submitContact,
+            Cancel: function () {
+                $dialog.dialog('close');
+            }
+        },
+        close: resetContactForm
+    });
 
-let modal;
-let contacts = [];
-init()
-function init(){
-    contactForm.addEventListener('submit', contactFormSubmit);
-    contactsList.addEventListener('click', onContactsListClick);
+    // const contactsListFooter = document.getElementById('contactsListFooter');
+    // const contactFormRow = document.getElementById('contactFormRow');
+    const contactTemplate = $('#contactTemplate').html();
 
-    fetchContacts();
-}
+    let contacts = [];
+    init()
+    function init(){
+        $contactForm.on('submit', contactFormSubmit);
+        // contactForm.addEventListener('submit', contactFormSubmit);
+        $contactsList.on('click', 'button', onContactsListButtonClick);
+        $('#addContactBtn').on('click', ()=> $dialog.dialog('open'));
+        $($contactPhoneInput).add($contactEmailInput).on('input', validateInput)
 
-function fetchContacts(){
-    return fetch(URL)
-            .then((response) => response.json())
-            .then(setContacts)
-            .then(rendeContacts);
-}
+        fetchContacts();
+    }
 
-function setContacts(data){
-    return contacts = data
-}
+    function validateInput(){
+        const $el = $(this);
+        const name = $el.attr('name');
+        const value = $el.val();
 
-function rendeContacts(data){
-    contactsList.innerHTML = data.map((contact) => {
-        return contactTemplate
-            .replace('{{id}}', contact.id)
-            .replace('{{name}}', contact.name)
-            .replace('{{phone}}', contact.phone)
-            .replace('{{email}}', contact.email)
-            .replace('{{class}}', contact.is_active? 'active': '')
-    }).join('\n');
-}
+        if (PATTERNS[name].test(value)){
+            $el.removeClass(INVALID_CLASS);
+        } else {
+            $el.addClass(INVALID_CLASS);
+        }
+    }
 
-function contactFormSubmit(e){
-    e.preventDefault();
+    function fetchContacts(){
+        return $.ajax(URL)
+                .then(setContacts)
+                .then(rendeContacts);
+    }
 
-    submitContact();
-}
+    function setContacts(data){
+        return contacts = data
+    }
 
-function onContactsListClick(event){
-    if (event.target.tagName === 'BUTTON'){
-        switch(event.target.dataset.type){
-            case 'edit': editContact(event.target.parentNode.parentNode);
+    function rendeContacts(data){
+        $contactsList.html(data.map((contact) => {
+            return contactTemplate
+                .replace('{{id}}', contact.id)
+                .replace('{{name}}', contact.name)
+                .replace('{{phone}}', contact.phone)
+                .replace('{{email}}', contact.email)
+                .replace('{{class}}', contact.is_active? 'active': '')
+        }).join('\n'));
+    }
+
+    function contactFormSubmit(e){
+        e.preventDefault();
+
+        submitContact();
+    }
+
+    function onContactsListButtonClick(){
+        $el = $(this);
+        switch($el.data('type')){
+            case 'edit': editContact($el.closest('.contact-row').data('contactId'));
                 break;
-            case 'delete': removeContact(event.target.parentNode.parentNode.dataset.contactId)
+            case 'delete': removeContact($el.closest('.contact-row').data('contactId'))
                             .then(fetchContacts); 
                 break;
         }
-    } else {
-        showContactDetails(event.target.parentNode.dataset.contactId);
-    }
-}
-
-function editContact(el){
-    const id = el.dataset.id;
-    const contact = contacts.find(c => c.ic === id);
-
-    contactIdInput.value = contact.id;
-    contactNameInput.value = contact.name;
-    contactPhoneInput.value = contact.phone;
-    emailInput.value = contact.email;
-
-    el.hidden = true;
-    contactsList.insertBefore(contactFormRow, el);
-}
-
-function removeContact(id){
-    return fetch(URL + '/' + id, {method: 'DELETE'});
-}
-
-function fetchContact(id){
-    return fetch(URL + '/' + id);
-}
-
-function showContactDetails(id){
-    if (!id){ return; }
-
-    fetchContact(id)
-        .then(resp => resp.json())
-        .then(openModal);
-};
-
-function openModal(contact){
-    modal = document.createElement('div');
-    modal.className = 'modal';
-
-    modal.innerHTML = modalTemplate
-            .replace('{{id}}', contact.id)
-            .replace('{{name}}', contact.name)
-            .replace('{{phone}}', contact.phone)
-            .replace('{{email}}', contact.email)
-            .replace('{{isActive}}', contact.is_active);
-
-    document.body.append(modal);
-    document.addEventListener('click', closeModal);
-}
-
-function closeModal(){
-    modal.remove();
-
-    document.removeEventListener('click', closeModal);
-}
-
-function updateContact(contact){
-    return fetch(URL + '/' + contact.id, {
-        method: "PUT",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contact)
-    });
-}
-
-function submitContact(){
-    const contact = {
-        name: contactNameInput.value,
-        phone: contactPhoneInput.value,
-        email: contactEmailInput.value,
-        is_active: true
     }
 
-    let savePromise;
+    function editContact(id){
+        const contact = contacts.find(c => c.id == id);
 
-    if (contactIdInput.value){
-        contact.id = contactIdInput.value;
-        savePromise = updateContact(contact);
-    } else {
-        savePromise = addContact(contact);
+        $contactIdInput.val(contact.id);
+        $contactNameInput.val(contact.name);
+        $contactPhoneInput.val(contact.phone);
+        $contactEmailInput.val(contact.email);
+
+        $dialog.dialog('open')
+   }
+
+    function removeContact(id){
+        return $.ajax(URL + '/' + id, {method: 'DELETE'});
     }
 
-    savePromise
-        .then(fetchContacts);
+    function updateContact(contact){
+        return $.ajax(URL + '/' + contact.id, {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(contact)
+        });
+    }
 
-    resetContactForm();
-}
+    function submitContact(){
+        const $invalidItems = $contactForm.find(`.${INVALID_CLASS}`);
 
-function addContact(contact){
-    return fetch(URL, {
-        method: "POST",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(contact)
-    });
-}
+        if ($invalidItems.length){
+            return alert('Please fix validation errors');
+        }
 
-function resetContactForm(){
-    contactsListFooter.append(contactFormRow);
-    contactForm.reset();
+        const contact = {
+            name: $contactNameInput.val(),
+            phone: $contactPhoneInput.val(),
+            email: $contactEmailInput.val(),
+            is_active: true
+        }
 
-    // contactIdInput.value = '';
-    // contactNameInput.value = '';
-    // contactPhoneInput.value = '';
-    // emailInput.value = '';
-}
+        let savePromise;
+
+        if ($contactIdInput.val()){
+            contact.id = $contactIdInput.val();
+            savePromise = updateContact(contact);
+        } else {
+            savePromise = addContact(contact);
+        }
+
+        savePromise
+            .then(fetchContacts);
+
+        // resetContactForm();
+        $dialog.dialog('close')
+    }
+
+    function addContact(contact){
+        return $.ajax(URL, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(contact)
+        });
+    }
+
+    function resetContactForm(){
+        $contactForm[0].reset();
+    }
+})

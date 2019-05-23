@@ -5,40 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Contacts</title>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="../common/css/normalize.css">
     <link rel="stylesheet" href="../common/css/skeleton.css">
     <link rel="stylesheet" href="./styles.css">
-    <script src="./app.js" async></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="./app.js"></script>
 </head>
 <body>
-    <form id="contactForm">
-        <table class="u-full-width">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="contactsList"></tbody>
-            <tfoot id="contactsListFooter">
-                <tr id="contactFormRow">
-                    <td>
-                        <input type="hidden" id="idInput" name="idInput">
-                        <input type="text" id="nameInput" name="nameInput">
-                    </td>
-                    <td>
-                        <input type="text" id="phoneInput" name="phoneInput">
-                    </td>
-                    <td>
-                        <input type="text" id="emailInput" name="emailInput">
-                    </td>
-                    <td><input type="submit" value="Save"></td>
-                </tr>
-            </tfoot>
-        </table>
-    </form>
+    <div class="row">            
+        <button id="addContactBtn" class="button-primary">Add Contact</button>
+    </div>
+    <table class="u-full-width">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="contactsList"></tbody>
+    </table>
+    <div id="dialog-form" title="Create new Contact">           
+        <form id="contactForm">
+            <fieldset>
+            <label for="nameInput">Name</label>
+            <input type="hidden" id="idInput" name="idInput">
+            <input type="text" id="nameInput" name="nameInput">
+
+            <label for="phoneInput">Phone</label>
+            <input type="text" id="phoneInput" name="phoneInput">
+
+            <label for="emailInput">Email</label>
+            <input type="text" id="emailInput" name="emailInput">
+        
+            <!-- Allow form submission with keyboard without duplicating the dialog button -->
+            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+            </fieldset>
+        </form>
+    </div>
     <script type="text/template" id="contactTemplate">
         <tr data-contact-id="{{id}}" class="contact-row {{class}}">
             <td>{{name}}</td>
@@ -49,15 +56,6 @@
                 <button type="button" data-type="delete">Delete</button>
             </td>
         </tr>
-    </script>
-    <script type="text/template" id="modalTemplate">
-        <ul class="modal-content">
-                <li>{{id}}</li>
-                <li>{{name}}</li>
-                <li>{{phone}}</li>
-                <li>{{email}}</li>
-                <li>{{isActive}}</li>
-        </ul>
     </script>
 </body>
 </html>
